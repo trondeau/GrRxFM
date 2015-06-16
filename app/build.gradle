@@ -1,0 +1,39 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    // SETUP TO USE OUR OWN Android.mk FILE
+    sourceSets.main {
+        jniLibs.srcDirs = ['src/main/libs']
+        jni.srcDirs = [] //disable automatic ndk-build call with auto-generated Android.mk
+    }
+
+    // call regular ndk-build against our Android.mk
+    task ndkBuild(type: Exec) {
+        commandLine 'ndk-build', '-C', file('src/main/jni').absolutePath
+    }
+
+    tasks.withType(JavaCompile) {
+        compileTask -> compileTask.dependsOn ndkBuild
+    }
+
+    defaultConfig {
+        applicationId "org.gnuradio.grtxfm"
+        minSdkVersion 21
+        targetSdkVersion 21
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+}

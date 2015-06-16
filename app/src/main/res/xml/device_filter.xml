@@ -1,0 +1,4 @@
+<resources>
+    <usb-device vendor-id="0bda" product-id="2838" /> <!-- RTL-SDR -->
+    <usb-device vendor-id="2500" product-id="0020" /> <!-- USRP B200/B210 -->
+</resources>

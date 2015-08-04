@@ -3,14 +3,80 @@
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".GrTxFM">
+    android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".GrTxFM"
+    android:id="@+id/mainlayout">
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Start"
         android:id="@+id/startButton"
+        android:layout_below="@+id/gainValueTextView2"
+        android:layout_centerHorizontal="true" />
+
+    <SeekBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/freqSeekBar2"
         android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/freqTextView2"
+        android:indeterminate="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Freq (MHz)"
+        android:id="@+id/freqTextView2"
+        android:layout_alignBottom="@+id/freqSeekBar2"
+        android:layout_alignParentStart="true"
+        android:editable="false"
+        android:textSize="@dimen/parameter_text"
+        android:textIsSelectable="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gain (dB)"
+        android:id="@+id/gainTextView2"
+        android:editable="false"
+        android:textSize="@dimen/parameter_text"
+        android:textIsSelectable="false"
+        android:layout_below="@+id/freqTextView2"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="39dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/freqValueTextView2"
+        android:editable="false"
+        android:textSize="@dimen/parameter_text"
+        android:textIsSelectable="false"
+        android:layout_alignEnd="@+id/freqSeekBar2"
+        android:layout_below="@+id/freqSeekBar2"
+        android:layout_toEndOf="@+id/freqTextView2"
+        android:textAlignment="center" />
+
+    <SeekBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gainSeekBar2"
+        android:layout_alignTop="@+id/gainTextView2"
+        android:layout_alignStart="@+id/freqValueTextView2"
+        android:layout_alignEnd="@+id/freqValueTextView2"
+        android:indeterminate="false" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/gainValueTextView2"
+        android:editable="false"
+        android:textSize="@dimen/parameter_text"
+        android:textIsSelectable="false"
+        android:textAlignment="center"
+        android:layout_below="@+id/gainSeekBar2"
+        android:layout_alignStart="@+id/gainSeekBar2"
+        android:layout_alignEnd="@+id/gainSeekBar2" />
 
 </RelativeLayout>

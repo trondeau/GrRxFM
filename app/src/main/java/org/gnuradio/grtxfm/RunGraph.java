@@ -5,8 +5,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
-import android.widget.EditText;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -15,7 +13,6 @@ import org.gnuradio.grcontrolport.RPCConnection;
 import org.gnuradio.grcontrolport.RPCConnectionThrift;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -82,26 +79,25 @@ public class RunGraph extends Activity {
     }
 
     private RunNetworkThread mControlPortThread;
-    private SeekBar mFreqSeekBar;
-    private SeekBar mGainSeekBar;
     private TextView mFreqValueTextView;
     private TextView mGainValueTextView;
+    private TextView mFMValueTextView;
 
     private final String freqKnobName = "gr uhd usrp sink0::center_freq";
     private final String gainKnobName = "gr uhd usrp sink0::gain";
+    private final String sensitivityKnobName = "frequency_modulator_fc0::sensitivity";
 
     private RPCConnection.KnobInfo prepareFreqKnob(Double freq) {
-        RPCConnection.KnobInfo knob =
-                new RPCConnection.KnobInfo(freqKnobName, freq, BaseTypes.DOUBLE);
-        Log.d("PrepFreqKnob", "Freq: " + freq);
-        return knob;
+        return new RPCConnection.KnobInfo(freqKnobName, freq, BaseTypes.DOUBLE);
     }
 
     private RPCConnection.KnobInfo prepareGainKnob(Double gain) {
-        RPCConnection.KnobInfo knob =
-                new RPCConnection.KnobInfo(gainKnobName, gain, BaseTypes.DOUBLE);
-        Log.d("PrepGainKnob", "Gain: " + gain);
-        return knob;
+        return new RPCConnection.KnobInfo(gainKnobName, gain, BaseTypes.DOUBLE);
+    }
+
+    private RPCConnection.KnobInfo prepareFMDeviationKnob(Double fm) {
+        Double k = 2.0 * Math.PI * fm / (320e3);
+        return new RPCConnection.KnobInfo(sensitivityKnobName, k, BaseTypes.DOUBLE);
     }
 
     private void postSetKnobMessage(HashMap<String, RPCConnection.KnobInfo> knobs) {
@@ -156,12 +152,13 @@ public class RunGraph extends Activity {
         setknobs.put(gainKnobName, knobGain);
         postSetKnobMessage(setknobs);
 
-        addFreqControls(Double.parseDouble(freq)*1e6);
+        addFreqControls(Double.parseDouble(freq) * 1e6);
         addGainControls(Double.parseDouble(gain));
+        addSensitivityControls();
     }
 
     private void addFreqControls(Double initFreq) {
-        mFreqSeekBar = (SeekBar) findViewById(R.id.freqSeekBar2);
+        SeekBar mFreqSeekBar = (SeekBar) findViewById(R.id.freqSeekBar2);
         mFreqValueTextView = (TextView) findViewById(R.id.freqValueTextView2);
         final Double minfreq = 88.1e6;
         final Double maxfreq = 107.9e6;
@@ -199,13 +196,13 @@ public class RunGraph extends Activity {
     }
 
     private void addGainControls(Double initGain) {
-        mGainSeekBar = (SeekBar) findViewById(R.id.gainSeekBar2);
+        SeekBar mGainSeekBar = (SeekBar) findViewById(R.id.gainSeekBar2);
         mGainValueTextView = (TextView) findViewById(R.id.gainValueTextView2);
 
         final Double stepgain = 0.5;
         mGainSeekBar.setMax(89 * 2);
 
-        mGainValueTextView.setText(String.format(initGain.toString()));
+        mGainValueTextView.setText(initGain.toString());
 
         Double dval = initGain / stepgain;
         Integer ival = dval.intValue();
@@ -220,6 +217,35 @@ public class RunGraph extends Activity {
                 RPCConnection.KnobInfo knobGain = prepareGainKnob(p);
                 HashMap<String, RPCConnection.KnobInfo> setknobs = new HashMap<>();
                 setknobs.put(gainKnobName, knobGain);
+                postSetKnobMessage(setknobs);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    private void addSensitivityControls() {
+        SeekBar mFMSeekBar = (SeekBar) findViewById(R.id.fmSeekBar2);
+        mFMValueTextView = (TextView) findViewById(R.id.fmValueTextView2);
+
+        mFMValueTextView.setText("100");
+        mFMSeekBar.setProgress(100);
+
+        mFMSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                Double p = 1e3 * progress;
+                mFMValueTextView.setText(String.format("%.1f", p / 1e3));
+
+                RPCConnection.KnobInfo knob = prepareFMDeviationKnob(p);
+                HashMap<String, RPCConnection.KnobInfo> setknobs = new HashMap<>();
+                setknobs.put(sensitivityKnobName, knob);
                 postSetKnobMessage(setknobs);
             }
 

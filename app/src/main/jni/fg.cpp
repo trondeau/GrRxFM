@@ -4,7 +4,6 @@
 
 // for gnuradio
 #include <gnuradio/top_block.h>
-#include <gnuradio/blocks/nop.h>
 #include <gnuradio/filter/firdes.h>
 #include <gnuradio/filter/interp_fir_filter_fff.h>
 #include <gnuradio/analog/frequency_modulator_fc.h>
@@ -19,8 +18,6 @@ gr::filter::interp_fir_filter_fff::sptr interp;
 gr::analog::frequency_modulator_fc::sptr fm;
 //osmosdr::sink::sptr snk;
 gr::uhd::usrp_sink::sptr snk;
-
-gr::blocks::nop::sptr nop;
 
 extern "C" {
 
@@ -45,7 +42,7 @@ Java_org_gnuradio_grtxfm_RunGraph_FgInit(JNIEnv* env, jobject thiz,
   std::vector<float> taps = gr::filter::firdes::low_pass_2(resamp, resamp*samp_rate, 10e3, 2e3, 60,
                                                            gr::filter::firdes::WIN_HANN);
 
-  float max_dev = 5e3;
+  float max_dev = 100e3;
   float k = 2.0f * M_PI * max_dev / (resamp*samp_rate);
 
   tb = gr::make_top_block("fg");
@@ -56,12 +53,9 @@ Java_org_gnuradio_grtxfm_RunGraph_FgInit(JNIEnv* env, jobject thiz,
   snk = gr::uhd::usrp_sink::make(args.str(), stream_args);
   snk->set_samp_rate(resamp*samp_rate);
 
-  nop = gr::blocks::nop::make(sizeof(float));
-
   tb->connect(src, 0, interp, 0);
   tb->connect(interp, 0, fm, 0);
   tb->connect(fm, 0, snk, 0);
-  tb->connect(src, 0, nop, 0);
 }
 
 JNIEXPORT void JNICALL

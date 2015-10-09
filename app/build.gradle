@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "org.gnuradio.grtxfm"
+        applicationId "org.gnuradio.grrxfm"
         minSdkVersion 21
         targetSdkVersion 21
         versionCode 1
@@ -42,4 +42,5 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':library')
+    compile 'com.androidplot:androidplot-core:0.6.1'
 }

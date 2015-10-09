@@ -4,7 +4,7 @@
 extern "C" {
 
 JNIEXPORT void JNICALL
-Java_org_gnuradio_grtxfm_GrTxFM_SetTMP(JNIEnv* env,
+Java_org_gnuradio_grrxfm_GrRxFM_SetTMP(JNIEnv* env,
                                        jobject thiz,
                                        jstring tmpname)
 {

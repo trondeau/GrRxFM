@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
-        tools:context=".GrTxFM"
+        tools:context=".GrRxFM"
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -127,6 +127,14 @@
             android:layout_below="@+id/fmSeekBar2"
             android:layout_alignStart="@+id/fmSeekBar2"
             android:layout_alignEnd="@+id/fmSeekBar2" />
+
+        <org.gnuradio.grrxfm.SampleView
+            android:id="@+id/sampleview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dip"
+            android:scrollbars="vertical"
+            android:fadingEdge="vertical" />
 
     </RelativeLayout>
 

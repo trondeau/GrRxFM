@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="org.gnuradio.grtxfm" >
+    package="org.gnuradio.grrxfm" >
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="org.gnuradio.grtxfm.GrTxFM"
+            android:name="org.gnuradio.grrxfm.GrRxFM"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -34,9 +34,9 @@
         </activity>
 
         <activity
-            android:name="org.gnuradio.grtxfm.RunGraph"
+            android:name="org.gnuradio.grrxfm.RunGraph"
             android:label="@string/app_name"
-            android:parentActivityName="org.gnuradio.grtxfm.GrTxFM" >
+            android:parentActivityName="org.gnuradio.grrxfm.GrRxFM" >
         </activity>
 
     </application>

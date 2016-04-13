@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="minfreq">87900000</integer>
+    <integer name="maxfreq">107900000</integer>
+    <integer name="stepfreq">200000</integer>
+</resources>

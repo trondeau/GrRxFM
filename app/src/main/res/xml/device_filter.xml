@@ -1,4 +1,9 @@
 <resources>
-    <usb-device vendor-id="0bda" product-id="2838" /> <!-- RTL-SDR -->
-    <usb-device vendor-id="2500" product-id="0020" /> <!-- USRP B200/B210 -->
+    <usb-device vendor-id="3034" product-id="10296" />  <!-- RTL-SDR -->
+    <usb-device vendor-id="9472" product-id="2" />      <!-- USRP B100 -->
+    <usb-device vendor-id="9472" product-id="32" />     <!-- USRP B200/B210 -->
+    <usb-device vendor-id="9472" product-id="33" />     <!-- USRP B200/B210 -->
+    <usb-device vendor-id="9472" product-id="34" />     <!-- USRP B200mini -->
+    <usb-device vendor-id="14627" product-id="30739" /> <!-- NI B200/B210 -->
+    <usb-device vendor-id="14627" product-id="30740" /> <!-- NI B200/B210 -->
 </resources>

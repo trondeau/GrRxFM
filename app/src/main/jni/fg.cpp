@@ -35,9 +35,9 @@ Java_org_gnuradio_grrxfm_RunGraph_FgInit(JNIEnv* env, jobject thiz,
 
   float samp_rate = 320e3;
 
-  const char *c_devname = env->GetStringUTFChars(devname, NULL);
+  const char *usbfs_path = env->GetStringUTFChars(devname, NULL);
   std::stringstream args;
-  args << "uhd,fd=" << fd << ",uspfs_path=" << c_devname;
+  args << "uhd,fd=" << fd << ",usbfs_path=" << usbfs_path;
   GR_INFO("fg", boost::str(boost::format("Using UHD args=%1%") % args.str()));
 
   uhd::stream_args_t stream_args;
@@ -74,7 +74,6 @@ Java_org_gnuradio_grrxfm_RunGraph_FgInit(JNIEnv* env, jobject thiz,
   //tb->connect(audio_filt, 0, snk, 0);
   sig = gr::analog::sig_source_f::make(audio_rate, gr::analog::GR_SIN_WAVE, 400, 0.5);
   tb->connect(sig, 0, vsnk, 0);
-
 }
 
 JNIEXPORT void JNICALL

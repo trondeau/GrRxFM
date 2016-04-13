@@ -1,8 +1,8 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    buildToolsVersion "22.0.1"
 
     // SETUP TO USE OUR OWN Android.mk FILE
     sourceSets.main {
@@ -12,24 +12,14 @@ android {
 
     // call regular ndk-build against our Android.mk
     task ndkBuild(type: Exec) {
-        commandLine 'ndk-build', '-C', file('src/main/jni').absolutePath
-    }
-
-    task ndkCleanup(type: Exec) {
-        mustRunAfter 'ndkBuild'
-        commandLine 'rm', '-f', file('src/main/libs/armeabi-v7a/libgnustl_shared.so').absolutePath
+        commandLine '/opt/ndk/ndk-build', '-C', file('src/main/jni').absolutePath
     }
 
     tasks.withType(JavaCompile) {
         compileTask -> compileTask.dependsOn ndkBuild
     }
 
-    tasks.withType(JavaCompile) {
-        compileTask -> compileTask.dependsOn ndkCleanup
-    }
-
     defaultConfig {
-        applicationId "org.gnuradio.grrxfm"
         minSdkVersion 21
         targetSdkVersion 21
         versionCode 1
@@ -41,18 +31,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
-    packagingOptions {
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/NOTICE'
-        exclude 'lib/armeabi-v7a/*'
-    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':controlport')
-    compile 'com.androidplot:androidplot-core:0.6.1'
-}
+    compile 'org.apache.thrift:libthrift:0.9.3'
+    compile 'org.slf4j:slf4j-api:1.7.12'
+    compile 'org.slf4j:slf4j-log4j12:1.7.12'
+    compile 'log4j:log4j:1.2.14'
+    compile 'com.androidplot:androidplot-core:0.6.1'}

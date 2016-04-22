@@ -2,7 +2,7 @@ LOCAL_PATH := $(call my-dir)
 
 #Build module for static library
 
-GRLIBPATH := /opt/grandroid/lib
+    GRLIBPATH := /opt/grandroid/lib
 
 ######################################################################
 #   REQUIRED BOOST LIBRARIES

@@ -48,59 +48,46 @@ public class GrRxFM extends Activity {
     private int cpport = 0;
     private static final String UHD_USB_INFO_FILE = "uhd_usb_info.txt";
     private static final String ACTION_USB_PERMISSION = "com.android.example.USB_PERMISSION";
+    private UsbManager mUsbManager;
+    private UsbDevice mUsbDevice;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_gr_rxfm);
 
         mContext = this.getApplicationContext();
 
         ReadUSBInfoFile();
         ReadThriftConfig();
 
+        SetTMP(getCacheDir().getAbsolutePath());
+
+        // Start setting up for USB permission request
         intent = getIntent();
-
-        UsbManager usbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
-        PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0);
-        UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-        if (device == null) {
+        mUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
+        IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+        registerReceiver(mUsbReceiver, filter);
+        mUsbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+        if (mUsbDevice == null) {
             Log.d("GrRxFM", "Didn't get a device; finding it now.");
-
             final HashSet<String> allowed_devices = getAllowedDevices(this);
-            final HashMap<String, UsbDevice> usb_device_list = usbManager.getDeviceList();
-
+            final HashMap<String, UsbDevice> usb_device_list = mUsbManager.getDeviceList();
             for (UsbDevice candidate : usb_device_list.values()) {
                 String candstr = "v" + candidate.getVendorId() + "p" + candidate.getProductId();
                 if (allowed_devices.contains(candstr)) {
                     // Need to handle case where we have more than one device connected
-                    device = candidate;
+                    mUsbDevice = candidate;
                 }
             }
         }
-        Log.d("GrRxFM", "Selected Device: " + device);
+        Log.d("GrRxFM", "Selected Device: " + mUsbDevice);
+        PendingIntent permissionIntent = PendingIntent.getBroadcast(this, 0,
+                new Intent(ACTION_USB_PERMISSION), 0);
 
-        usbManager.requestPermission(device, permissionIntent);
-
-        final UsbDeviceConnection connection = usbManager.openDevice(device);
-        if (connection == null) {
-            Log.d("GrRxFM", "Didn't get a USB Device Connection");
-            finish();
-        }
-
-        assert connection != null;
-        fd = connection.getFileDescriptor();
-
-        assert device != null;
-        int vid = device.getVendorId();
-        int pid = device.getProductId();
-
-        Log.d("GrRxFM", "Found fd: " + fd + "  vid: " + vid + "  pid: " + pid);
-
-        SetTMP(getCacheDir().getAbsolutePath());
-
-        setContentView(R.layout.activity_gr_rxfm);
-
-        setupRadio();
+        // Launch dialog to ask for permission.
+        // If use hits OK, the broadcast receiver will be launched.
+        mUsbManager.requestPermission(mUsbDevice, permissionIntent);
     }
 
 
@@ -136,7 +123,7 @@ public class GrRxFM extends Activity {
         fd = Integer.valueOf(strfd);
         usbfs_path = strusb;
 
-        Log.d("GrTxFM", "Got USB Info from File: " + fd + ", " + usbfs_path);
+        Log.d("GrRxFM", "Got USB Info from File: " + fd + ", " + usbfs_path);
     }
 
     private void ReadThriftConfig() {
@@ -173,6 +160,25 @@ public class GrRxFM extends Activity {
                 cpport = Integer.valueOf(s_port);
             }
         }
+    }
+
+    private void setupUSB() {
+        final UsbDeviceConnection connection = mUsbManager.openDevice(mUsbDevice);
+
+        if (connection != null) {
+            fd = connection.getFileDescriptor();
+        } else {
+            Log.d("GrRxFM", "Didn't get a USB Device Connection");
+            finish();
+        }
+
+        int vid = mUsbDevice.getVendorId();
+        int pid = mUsbDevice.getProductId();
+
+        Log.d("GrRxFM", "Found fd: " + fd + "  usbfs_path: " + usbfs_path);
+        Log.d("GrRxFM", "Found vid: " + vid + "  pid: " + pid);
+
+        setupRadio();
     }
 
     private void setupRadio() {
@@ -273,6 +279,27 @@ public class GrRxFM extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (ACTION_USB_PERMISSION.equals(action)) {
+                synchronized (this) {
+                    UsbDevice device = (UsbDevice)intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+
+                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+                        if(device != null){
+                            mUsbDevice = device;
+                            setupUSB();
+                        }
+                    }
+                    else {
+                        Log.d("GrRxFM", "Permission denied for device " + device);
+                    }
+                }
+            }
+        }
+    };
 
     /*
      * Reads from the device_filter.xml file to get a list of the allowable devices.
